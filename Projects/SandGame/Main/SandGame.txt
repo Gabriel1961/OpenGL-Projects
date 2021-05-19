@@ -1,0 +1,154 @@
+// Contine functia main a proiectului cu sandGame
+#include "OpenGLWrapper/Common.h"
+#include "SandGame/ParticleMatrix.h"
+#include <fstream>
+#include <string>
+#include <sstream>
+#include <Math.h>
+#include <conio.h>
+#include <iomanip>
+#define pi 3.14159265359
+#define _USE_MATH_DEFINES
+
+#include "OpenGLWrapper/VertexBuffer.h"
+#include "OpenGLWrapper/IndexBuffer.h"
+#include "OpenGLWrapper/Shader.h"
+#include "OpenGLWrapper/VertexArray.h"
+#include "OpenGLWrapper/Renderer.h"
+#include "OpenGLWrapper/Texture.h"
+typedef unsigned int uint;
+typedef unsigned short ushort;
+typedef unsigned char uchar;
+#define Window_Width 640
+#define Window_Height 400
+const float AspectR = (float)Window_Height / Window_Width;
+namespace Mouse {
+	bool LeftPressed = false;
+	double Y=0, X=0, PrevX=0, PrevY=0, SpeedX=0, SpeedY=0;
+	static void ButtonCallBack(GLFWwindow* window, int button, int action, int mods) { if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) LeftPressed = true; 
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) LeftPressed = false;
+	}
+	static void PositionCallBack(GLFWwindow* window, double Xpos, double Ypos) {
+		PrevY = Y;
+		PrevX = X;
+		Y =-( Ypos/ (Window_Height / 2) - 1);
+		X = Xpos / (Window_Width / 2) - 1; 
+		SpeedX = X - PrevX;
+		SpeedY = Y - PrevY;
+	}
+}
+
+static ParticleType selectedParticle = ParticleType::Sand;
+static int brushSize = 10;
+void KeyPressCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+	if (key == GLFW_KEY_1 && action == GLFW_PRESS)
+		selectedParticle = ParticleType::Sand;
+	else if (key == GLFW_KEY_2 && action == GLFW_PRESS)
+		selectedParticle = ParticleType::Fluid;
+	else if (key == GLFW_KEY_KP_SUBTRACT && action == GLFW_PRESS)
+		brushSize -= 2;
+	else if(key == GLFW_KEY_KP_ADD && action == GLFW_PRESS)
+		brushSize += 2;
+}
+
+int main(void)
+{
+	GLFWwindow* window;
+	/* Initialize the library */
+	if (!glfwInit())
+		return -1;
+	/* Create a windowed mode window and its OpenGL context */
+	window = glfwCreateWindow(Window_Width, Window_Height, "Hello World", NULL, NULL);
+	if (!window)
+	{
+		glfwTerminate();
+		return -1;
+	}
+	/* Make the window's context current */
+	glfwMakeContextCurrent(window);
+	{
+	if (glewInit() != GLEW_OK) {
+		std::cout << "Failed to initilize glew\n" << std::endl;
+		ASSERT(false);
+	}
+	{
+		using namespace Mouse;
+		glfwSetInputMode(window, GLFW_STICKY_KEYS, 1);
+		glfwSetCursorPosCallback(window, PositionCallBack);
+		glfwSetMouseButtonCallback(window, ButtonCallBack);
+		glfwSetKeyCallback(window, KeyPressCallback);
+	}
+	/// ///////////////////////////////////////////
+	int frameKounter = 0; 
+	double previousTime = glfwGetTime();
+	/// ///////////////////////////////////////////
+	const int matHeight = Window_Height;
+	const int matWidth = Window_Width;
+	ParticleMatrix particleMatrix(matWidth,matHeight);
+	particleMatrix.AddParticle(ParticleType::Sand,Point(50,50));
+	particleMatrix.AddParticle(ParticleType::Sand,Point(60,50));
+	particleMatrix.AddParticle(ParticleType::Sand,Point(70,50));
+	particleMatrix.AddParticle(ParticleType::Sand,Point(80,50));
+	Shader shader("res/shaders/VeryBasic.shader");
+	while (!glfwWindowShouldClose(window))
+	{
+		#pragma region Common Stuff
+
+
+		frameKounter++;
+		double currentTime = glfwGetTime();
+		if (currentTime - previousTime >= 1.0)
+		{
+			auto str = std::to_string(frameKounter);
+			glfwSetWindowTitle(window, str.c_str());
+			frameKounter = 0;
+			previousTime = currentTime;
+		}
+		/// <summary>
+		/// Add particle on press
+		/// </summary>
+		/// <param name=""></param>
+		/// <returns></returns>
+		if (Mouse::LeftPressed)
+		{
+			int x = (int)((Mouse::X + 1.0f) / 2.0f * matWidth);
+			int y = matHeight - (int)((Mouse::Y + 1.0f) / 2.0f * matHeight);
+			for (int j = y - brushSize; j < y + brushSize; j++)
+				for (int i = x - brushSize; i < x + brushSize; i++)
+				{
+					if (rand() % 10 == 3)
+					{
+						particleMatrix.AddParticle(selectedParticle, Point(i, j));
+					}
+				}
+		}
+#pragma endregion
+		
+		/* Render here */
+		Renderer::Clear();
+	
+		particleMatrix.UpdateAllParticles();
+		auto drawData = particleMatrix.GetVertexRenderPos();
+		shader.Bind();
+		VertexArray va;
+		VertexBuffer vb(drawData.second, drawData.first);
+		VertexBufferLayout layout;
+		layout.Push<float>(2);
+		layout.Push<float>(3);
+		va.AddLayout(vb, layout);
+		va.Bind();
+
+		glDrawArrays(GL_POINTS,0, particleMatrix.GetParticleCount());
+
+		delete[] drawData.first;
+		/* Swap front and back buffers */
+		glfwSwapBuffers(window);
+
+		/* Poll for and process events */
+		glfwPollEvents();
+	}
+	}
+	glfwTerminate();
+	return 0;
+}
