@@ -1,6 +1,6 @@
-#include "OpenGLWrapper/Common.h"
+#include "ScreenSize.h"
+#include "Common.h"
 #include <fstream>
-#include <future>
 #include <string>
 #include <sstream>
 #include <Math.h>
@@ -8,30 +8,24 @@
 #include <iomanip>
 #define _USE_MATH_DEFINES
 
-
-#include "OpenGLWrapper/VertexBuffer.h"
-#include "OpenGLWrapper/IndexBuffer.h"
-#include "OpenGLWrapper/Shader.h"
-#include "OpenGLWrapper/VertexArray.h"
-#include "OpenGLWrapper/Renderer.h"
-#include "OpenGLWrapper/Texture.h"
-#include "Dependencies/Action/Action.h"
-
-#include "Projects/Minecraft/Minecraft.h"
-#define Window_Width 800
-#define Window_Height 600
-const float AspectR = (float)Window_Height / Window_Width;
-
+//#include "Projects/PerlinNoise/PerlinNoiseProject.h"
+#include "RayTracer/RayTracer.h"
+#include "VertexBuffer.h"
+#include "IndexBuffer.h"
+#include "Shader.h"
+#include "VertexArray.h"
+#include "Renderer.h"
+#include "Texture.h"
+#include "Text/Text.h"
 
 int main(void)
 {
-    #pragma region Init
 	GLFWwindow* window;
 	/* Initialize the library */
 	if (!glfwInit())
 		return -1;
 	/* Create a windowed mode window and its OpenGL context */
-	window = glfwCreateWindow(Window_Width, Window_Height, "Hello World", NULL, NULL);
+	window = glfwCreateWindow(Window_Width, Window_Height, "OpenGLPractice", NULL, NULL);
 	if (!window)
 	{
 		glfwTerminate();
@@ -39,47 +33,48 @@ int main(void)
 	}
 	/* Make the window's context current */
 	glfwMakeContextCurrent(window);
-	
-	if (glewInit() != GLEW_OK) {
-		std::cout << "Failed to initilize glew\n" << std::endl;
-		ASSERT(false);
-	}
-	
-	/// ///////////////////////////////////////////
-	int frameKounter = 0; 
-	double previousTime = glfwGetTime();
-	/// ///////////////////////////////////////////
-
-	#pragma endregion
-	
-	Minecraft::Start(window,AspectR,Window_Width,Window_Height);
-	
-	while (!glfwWindowShouldClose(window))
 	{
-		#pragma region Common Stuff
-
-		frameKounter++;
-		double currentTime = glfwGetTime();
-		if (currentTime - previousTime >= 1.0)
-		{
-			auto str = std::to_string(frameKounter);
-			glfwSetWindowTitle(window, str.c_str());
-			frameKounter = 0;
-			previousTime = currentTime;
+		if (glewInit() != GLEW_OK) {
+			std::cout << "Failed to initilize glew\n" << endl;
+			ASSERT(false);
 		}
-		#pragma endregion
-		
-		/* Render here */
-		Renderer::Clear();
-		
-		Minecraft::Render();
+		Imgui_Start(window);
+		/// ///////////////////////////////////////////
+		double lastTime = glfwGetTime();
+		int nbFrames = 0;
+		/// ///////////////////////////////////////////
+		gc(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+		gc(glEnable(GL_BLEND));
+		RayTracer::Start(window);
 
-		/* Swap front and back buffers */
-		glfwSwapBuffers(window);
+		while (!glfwWindowShouldClose(window))
+		{
+#pragma region FrameCounter
+			double currentTime = glfwGetTime();
+			nbFrames++;
+			if (currentTime - lastTime >= 1.0) { // If last prinf() was more than 1 sec ago
+				// printf and reset timer
+				glfwSetWindowTitle(window, std::to_string(nbFrames).c_str());
+				nbFrames = 0;
+				lastTime += 1.0;
+			}
+#pragma endregion
+			Renderer::Clear();
+			Imgui_NewFrame();
+			/* Render here */
 
-		/* Poll for and process events */
-		glfwPollEvents();
+			RayTracer::Render();
+
+			Imgui_Render();
+			/* Swap front and back buffers */
+			glfwSwapBuffers(window);
+
+			/* Poll for and process events */
+			glfwPollEvents();
+		}
+		RayTracer::Terminate();
 	}
+	Imgui_Close();
 
 	glfwTerminate();
 	return 0;

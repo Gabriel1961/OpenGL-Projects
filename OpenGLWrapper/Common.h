@@ -5,7 +5,11 @@
 #include <GL/glm/gtc/matrix_transform.hpp>
 #include <iostream>
 #include <assert.h>
+#include <vendor/imgui/ImguiLib.h>
+#include "../../Dependencies/Action/Action.h"
+#define endl '\n'
 #define pi 3.14159265359
+#define null 0
 typedef unsigned int uint;
 typedef unsigned short ushort;
 typedef unsigned char uchar;
@@ -17,6 +21,11 @@ typedef unsigned char uchar;
 static void GLClearError()
 {
 	while (glGetError() != GL_NO_ERROR);
+}
+template<typename T>
+inline float Det(const T& a, const T& b)
+{
+	return a.x * b.y - a.y * b.x;
 }
 
 static bool GLCheckError()
@@ -50,8 +59,65 @@ static bool GLCheckError()
 		default:
 			std::cout << "Unrecognized error" << error;
 		}
-		std::cout << std::endl;
+		std::cout << endl;
 		return false;
 	}
 	return true;
 }
+struct ARGBColor
+{
+	ARGBColor() {}
+	ARGBColor(uchar a, uchar r, uchar g, uchar b)
+		:a(a), r(r), b(b), g(g) {}
+	uchar r = 255, g = 255, b = 255, a = 255;
+};
+
+struct Color
+{
+	//Constructors
+	Color() {}
+	Color(float r, float g, float b) :rgb(r, g, b) {}
+	Color(glm::vec3 color) :rgb(color) {}
+
+	//Static funcs
+	static Color Black() { return Color(0, 0, 0); };
+	static Color White() { return Color(1, 1, 1); };
+	static Color Red() { return Color(1, 0, 0); };
+	static Color Green() { return Color(0, 1, 0); };
+	static Color Blue() { return Color(0, 0, 1); };
+	static Color Random() {
+		return Color(
+			(float)rand() / (float)RAND_MAX,
+			(float)rand() / (float)RAND_MAX,
+			(float)rand() / (float)RAND_MAX);
+	}
+
+	//Methods
+	void GammaCorrect()
+	{
+		rgb = sqrt(rgb);
+	}
+
+	// Operators
+	Color operator*(float f)const
+	{
+		return this->rgb * f;
+	}
+
+	operator ARGBColor() const
+	{
+		return ARGBColor(255, uchar(rgb.r * 255), uchar(rgb.g * 255), uchar(rgb.b * 255));
+	}
+
+	Color operator+(const Color& c)const
+	{
+		return Color(rgb + c.rgb);
+	}
+
+	Color operator*(const Color& c)const
+	{
+		return { c.rgb * rgb };
+	}
+	// Public Fields
+	glm::vec3 rgb = glm::vec3(0);
+};

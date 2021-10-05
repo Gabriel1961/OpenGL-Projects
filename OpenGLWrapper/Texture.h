@@ -1,5 +1,7 @@
 #pragma once
 #include <string>
+#include <Common.h>
+#include <../ScreenSize.h>
 class Texture
 {
 private:
@@ -8,10 +10,12 @@ private:
 	unsigned char* m_LocalBuffer;
 	int m_Height, m_Width, m_BPP;
 public:
-	Texture(const char* _FilePath);
+	Texture(std::string _FilePath);
+	Texture();
+	Texture(ARGBColor* buffer, GLenum antiAliasing = GL_NEAREST);
 	~Texture();
 
-	void Bind(unsigned int slot=0) const;
+	void Bind(unsigned int slot = 0) const;
 	void Unbind() const;
 
 	int  GetHeight()const { return m_Height; };

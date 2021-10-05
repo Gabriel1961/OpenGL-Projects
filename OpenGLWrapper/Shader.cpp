@@ -12,7 +12,7 @@ void ShaderCompilationErrorCheck(unsigned int shaderID)
 		int Type;
 		gc(glGetShaderiv(shaderID, GL_SHADER_TYPE, &Type);
 		gc(glGetShaderiv(shaderID, GL_INFO_LOG_LENGTH, &LogLenght));
-		char* Message = (char*)alloca(sizeof(char)*LogLenght));
+		char* Message = (char*)alloca(sizeof(char) * LogLenght));
 		gc(glGetShaderInfoLog(shaderID, LogLenght, &LogLenght, Message));
 		std::cout << "[Shader Error] Failed to compile " << (Type == GL_VERTEX_SHADER ? "Vertex Shader - " : "Fragment Shader - ") << Message << '\n';
 	}
@@ -26,7 +26,7 @@ void ShaderLinkErrorCheck(unsigned int program)
 		char Message[1024];
 		int size;
 		glGetShaderInfoLog(program, size, &size, Message);
-		std::cout << "Failed to link program " << Message << std::endl;
+		std::cout << "Failed to link program " << Message << endl;
 	}
 }
 unsigned int CreateProgam(std::string filepath)
@@ -86,7 +86,7 @@ unsigned int CreateProgam(std::string filepath)
 	return program;
 }
 
-Shader::Shader(const char* filepath) : m_RendererID(0),m_FilePath(filepath)
+Shader::Shader(const std::string& filepath) : m_RendererID(0), m_FilePath(filepath)
 {
 	m_RendererID = CreateProgam(filepath);
 	gc(glUseProgram(m_RendererID));
@@ -107,42 +107,52 @@ void Shader::Unbind() const
 {
 	gc(glUseProgram(0));
 }
-void Shader::SetUniform2f(std::string name, float v0, float v1)
+void Shader::SetUniform2f(const std::string& name, float v0, float v1)
 {
 	Bind();
 	gc(glUniform2f(GetUniformLocation(name), v0, v1));
 }
-void Shader::SetUniform3f(std::string name, float v0, float v1, float v2)
+void Shader::SetUniform3f(const std::string& name, float v0, float v1, float v2)
 {
 	Bind();
 	gc(glUniform3f(GetUniformLocation(name), v0, v1, v2));
 }
-void Shader::SetUniform3f(std::string name, glm::vec3 vec)
+void Shader::SetUniform3f(const std::string& name, const glm::vec3& vec)
 {
 	Bind();
 	gc(glUniform3f(GetUniformLocation(name), vec.x, vec.y, vec.z));
 }
-void Shader::SetUniform4f(std::string name, float v0, float v1, float v2, float v3)
+void Shader::SetUniform4f(const std::string& name, float v0, float v1, float v2, float v3)
 {
 	Bind();
-	gc(glUniform4f(GetUniformLocation(name), v0, v1, v2, v3)); 
+	gc(glUniform4f(GetUniformLocation(name), v0, v1, v2, v3));
 }
-void Shader::SetUniform1f(std::string name, float v0)
+void Shader::SetUniform4f(const std::string& name, const glm::vec4& vec)
+{
+	Bind();
+	gc(glUniform4f(GetUniformLocation(name), vec[0], vec[1], vec[2], vec[3]));
+}
+void Shader::SetUniform1f(const std::string& name, float v0)
 {
 	Bind();
 	gc(glUniform1f(GetUniformLocation(name), v0));
 }
-void Shader::SetUniformMat4f(std::string name, glm::mat4& matrix)
+void Shader::SetUniform1i(const std::string& name, int val)
+{
+	Bind();
+	gc(glUniform1i(GetUniformLocation(name), val));
+}
+void Shader::SetUniformMat4f(const std::string& name, const glm::mat4& matrix)
 {
 	Bind();
 	gc(glUniformMatrix4fv(GetUniformLocation(name), 1, false, &matrix[0][0]));
 }
-void Shader::SetUniformMat3f(std::string name, glm::mat3& matrix)
+void Shader::SetUniformMat3f(const std::string& name, const glm::mat3& matrix)
 {
 	Bind();
 	gc(glUniformMatrix3fv(GetUniformLocation(name), 1, false, &matrix[0][0]));
 }
-void Shader::SetUniformMat2f(std::string name, glm::mat2& matrix)
+void Shader::SetUniformMat2f(const std::string& name, const glm::mat2& matrix)
 {
 	Bind();
 	gc(glUniformMatrix2fv(GetUniformLocation(name), 1, false, &matrix[0][0]));

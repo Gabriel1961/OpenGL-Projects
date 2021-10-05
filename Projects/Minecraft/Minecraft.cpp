@@ -1,5 +1,6 @@
 #include "Minecraft.h"
 #include <thread>
+#include <cmath>
 #include "../../OpenGLWrapper/Common.h"
 #include "../../src/Input/Input.h"
 #include "../../OpenGLWrapper/VertexBuffer.h"
@@ -9,87 +10,57 @@
 #include "../../OpenGLWrapper/Renderer.h"
 #include "../../OpenGLWrapper/Texture.h"
 #include "../../Dependencies/Action/Action.h"
+#include "./Blocks/BlockFace.h"
+using namespace std;
+#define TEXTURE_DIR std::string("Projects/Minecraft/Resources/Textures/")
+#define SHADER_DIR std::string("Projects/Minecraft/Resources/Shaders/")
+#define CURRENT_DIR std::string("Projects/Minecraft/")
 
 std::thread* Minecraft::inputThread = nullptr;
-glm::vec3 CamPos = glm::vec3(0,0,-10);
+glm::vec3 CamPos = glm::vec3(0, 0, -10);
 CameraRotation CamRotation;
-
-VertexArray* CubeVertexArray = NULL;
-VertexBuffer* CubeVertexBuffer = NULL;
-IndexBuffer* CubeIndexBufferFill = NULL;
-IndexBuffer* CubeIndexBufferFrame = NULL;
-Shader* shader = NULL;
-GLFWwindow* window;
-
 const double camSpeed = 0.1;
 
-void Minecraft::Start(GLFWwindow* _window,float AspectR,int Window_Width,int Window_Height)
+GLFWwindow* window;
+
+vector<BlockFace> blockFaces;
+glm::vec3 sunVec;
+void Minecraft::Start(GLFWwindow* _window, float AspectR, int Window_Width, int Window_Height)
 {
+	sunVec = glm::vec3(0, -1, 0);
 	window = _window;
 	Input::Init(window, Window_Width, Window_Height);
-	CubeVertexArray = new VertexArray();
 	CamPos = glm::vec3(0, 0, -10);
-	
-	glm::mat3 mat_MVP
-	{
-		AspectR,0,0,
-		0,      1,0,
-		0,      0,AspectR
-	};
-	
-	float CubData[]{
-	-1,-1,-1, // 0
-	 1,-1,-1, // 1
-	 1,-1, 1, // 2
-	-1,-1, 1, // 3 
-	-1, 1,-1, // 4 
-	 1, 1,-1, // 5 
-	 1, 1, 1, // 6
-	-1, 1, 1  // 7 
-	};
-	
-	uchar CubeFillIndexData[]{
-	0,4,5,
-	0,5,1,
 
-	1,5,6,
-	1,6,2,
+	float fov = pi / 2;
+	float zNear = 0.1;
+	float zFar = 100;
+	glm::mat4 projMat(
+		AspectR * 1 / glm::tan(fov / 2), 0, 0, 0,
+		0, 1.0f / glm::tan(fov / 2), 0, 0,
+		0, 0, zFar / (zFar - zNear), 1,
+		0, 0, -zNear * zFar / (zFar - zNear), 0
+	);
 
-	2,6,7,
-	2,7,3,
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
 
-	3,7,4,
-	3,4,0,
+	auto CubeTexture = new Texture(TEXTURE_DIR + string("grass.png"));
+	auto CubeShader = new Shader(SHADER_DIR + string("Cube.shader"));
 
-	0,3,2,
-	0,2,1,
+	blockFaces.push_back(BlockFace(FaceOrientation::Front, *CubeTexture, *CubeShader, glm::vec3(0, 1, 0), CamPos, CamRotation, projMat, sunVec));
+	blockFaces.push_back(BlockFace(FaceOrientation::Down, *CubeTexture, *CubeShader, glm::vec3(0, 1, 0), CamPos, CamRotation, projMat, sunVec));
+	for (int i = 0; i < 10; i++)
+		for (int j = 0; j < 10; j++)
+		{
+			blockFaces.push_back(BlockFace(FaceOrientation::Up, *CubeTexture, *CubeShader, glm::vec3(i * 2.01, 0, j * 2.01), CamPos, CamRotation, projMat, sunVec));
+		}
 
-	4,7,6,
-	4,6,5
-	};
-	
-	uchar CubeFrameIndexData[]{
-	4,5,
-	5,6,
-	6,7,
-	7,4
-	};
-
-	ASSERT(sizeof(*CubeFillIndexData) == 1);
-	CubeVertexBuffer = new VertexBuffer(sizeof(CubData), CubData);
-	CubeIndexBufferFill = new IndexBuffer(sizeof(CubeFillIndexData) / sizeof(*CubeFillIndexData), CubeFillIndexData, GL_UNSIGNED_BYTE);
-	CubeIndexBufferFrame = new IndexBuffer(sizeof(CubeFrameIndexData) / sizeof(*CubeFrameIndexData), CubeFrameIndexData, GL_UNSIGNED_BYTE);
-	VertexBufferLayout layout;
-	layout.Push<float>(3);
-	CubeVertexArray->AddLayout(*CubeVertexBuffer, layout);
-	shader =new Shader("res/shaders/Cube.shader");
-	shader->SetUniform3f("u_CameraPos", CamPos);
-	shader->SetUniformMat3f("u_mvp", mat_MVP);
 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // seteaza cursorul lockat pe window
 
-	#pragma region Input
- 	inputThread = new std::thread([&] {
+#pragma region Input
+	inputThread = new std::thread([&] {
 		while (!glfwWindowShouldClose(window))
 		{
 			if (glfwGetKey(window, GLFW_KEY_SPACE))
@@ -137,25 +108,6 @@ void Minecraft::Start(GLFWwindow* _window,float AspectR,int Window_Width,int Win
 
 void Minecraft::Render()
 {
-	shader->SetUniform3f("u_CameraPos", CamPos);
-	shader->SetUniform2f("u_CameraAngle", CamRotation.AngleX, CamRotation.AngleY);
-	for (int i = 0; i < 20; i++)
-	{
-		for (int j = 0; j < 20; j++)
-		{
-			shader->SetUniform3f("u_CubePos", glm::vec3(j * 2, 0, i * 2));
-			shader->SetUniform4f("u_CubeColor", 0, 1, 0, 1);
-			Renderer::Draw(*CubeVertexArray, *CubeIndexBufferFill, *shader, GL_TRIANGLES);
-		}
-	}
-	for (int i = 0; i < 20; i++)
-	{
-		for (int j = 0; j < 20; j++)
-		{
-			shader->SetUniform3f("u_CubePos", glm::vec3(j * 2, 0, i * 2));
-			shader->SetUniform4f("u_CubeColor", 0, 0, 0, 1);
-			Renderer::Draw(*CubeVertexArray, *CubeIndexBufferFrame, *shader, GL_LINES);
-		}
-	}
-
+	for (auto face : blockFaces)
+		face.Render();
 }

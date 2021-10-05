@@ -69,7 +69,7 @@ int main(void)
 	glfwMakeContextCurrent(window);
 	{
 	if (glewInit() != GLEW_OK) {
-		std::cout << "Failed to initilize glew\n" << std::endl;
+		std::cout << "Failed to initilize glew\n" << endl;
 		ASSERT(false);
 	}
 	{

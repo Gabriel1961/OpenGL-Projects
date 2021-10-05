@@ -18,9 +18,6 @@
     <ClCompile Include="OpenGLWrapper\IndexBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="OpenGLWrapper\Renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -39,13 +36,46 @@
     <ClCompile Include="OpenGLWrapper\vendor\stb_image\stb_image.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Projects\SandGame\SandParticle.cpp">
+    <ClCompile Include="OpenGLWrapper\vendor\imgui\imgui.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Projects\SandGame\ParticleMatrix.cpp">
+    <ClCompile Include="OpenGLWrapper\vendor\imgui\imgui_demo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Projects\Minecraft\Minecraft.cpp">
+    <ClCompile Include="OpenGLWrapper\vendor\imgui\imgui_draw.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenGLWrapper\vendor\imgui\imgui_tables.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenGLWrapper\vendor\imgui\imgui_widgets.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenGLWrapper\vendor\imgui\imgui_impl_glfw.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenGLWrapper\vendor\imgui\imgui_impl_opengl3.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenGLWrapper\vendor\imgui\ImguiLib.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenGLWrapper\Transform.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Input\Input.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenGLWrapper\Text\Text.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenGLWrapper\DebugLine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Projects\RayTracer\RayTracer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -77,34 +107,76 @@
     <ClInclude Include="OpenGLWrapper\vendor\stb_image\stb_image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Projects\SandGame\SandParticle.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Projects\SandGame\ParticleMatrix.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Projects\SandGame\Particle.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Projects\SandGame\FluidParticle.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Dependencies\Action\Action.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenGLWrapper\vendor\imgui\imconfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenGLWrapper\vendor\imgui\imgui.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenGLWrapper\vendor\imgui\imgui_internal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenGLWrapper\vendor\imgui\imstb_rectpack.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenGLWrapper\vendor\imgui\imstb_textedit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenGLWrapper\vendor\imgui\imstb_truetype.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenGLWrapper\vendor\imgui\imgui_impl_glfw.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenGLWrapper\vendor\imgui\imgui_impl_opengl3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenGLWrapper\vendor\imgui\ImguiLib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ScreenSize.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenGLWrapper\Transform.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Input\Input.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Projects\Minecraft\Minecraft.h">
+    <ClInclude Include="OpenGLWrapper\Text\ImageFont.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenGLWrapper\Text\Text.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenGLWrapper\DebugLine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenGLWrapper\Quad.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenGLWrapper\PixelDisplay.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Projects\RayTracer\RayTracer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Projects\RayTracer\RayTracingImpl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenGLWrapper\Logger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\VeryBasic.shader" />
     <None Include="res\shaders\Basic.shader" />
-    <None Include="res\shaders\Cube.shader" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="Projects\SandGame\Main\SandGame.txt" />
+    <None Include="res\shaders\TriangleTex.shader" />
+    <None Include="OpenGLWrapper\Line.shader" />
+    <None Include="OpenGLWrapper\Quad.shader" />
+    <None Include="OpenGLWrapper\PixelDisplay.shader" />
   </ItemGroup>
 </Project>
