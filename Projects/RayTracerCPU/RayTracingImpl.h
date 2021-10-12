@@ -2,8 +2,9 @@
 #include <tuple>
 #include <Common.h>
 #include <../ScreenSize.h>
+#include <Logger.h>
 #include <random>
-
+#include <vector>
 using namespace glm;
 namespace HelperFuncs
 {
@@ -22,8 +23,27 @@ namespace HelperFuncs
 		} while (dot(p, p) >= 1.0f);
 		return p;
 	}
-}
 
+	/// <summary>
+	/// Refracts ray
+	/// </summary>
+	/// <param name="incident">- must be normalized</param>
+	/// <param name="normal">- must be normalized</param>
+	/// <param name="ni_divby_nr">- n1/n2</param>
+	/// <param name="refracted"></param>
+	/// <returns>if refraction was possible</returns>
+	inline bool Refract(const vec3& incident, const vec3& normal, const float ni_divby_nr, vec3& refracted)
+	{
+		float dt = dot(incident, normal);
+		float cy2 = 1.0f - ni_divby_nr * ni_divby_nr * (1.0f - dt * dt);
+		if (cy2 > 0) {
+			refracted = ni_divby_nr * (incident - normal * dt) - normal * sqrt(cy2);
+			return true;
+		}
+		else
+			return false;
+	}
+};
 struct Ray
 {
 	// Constructors
@@ -198,7 +218,7 @@ public:
 	///Number of samples per pixel;
 	int samplesPP = 4;
 	vec3 leftDown = vec3(-1, -AspectR, -1 / invDistToScreen);
-	float invDistToScreen = 1 / 3.0f;
+	float invDistToScreen = 0.6;
 };
 
 /// <summary>
@@ -230,46 +250,55 @@ public:
 class MetalMat : public Material
 {
 public:
-	MetalMat(const Color& albedo) :albedo(albedo) {}
+	MetalMat(const Color& albedo, float fuzz) :albedo(albedo), fuzz(fuzz) {}
 	bool Scatter(const Ray& ray, const RayHitInfo& info, vec3& attenuation, Ray& scattered)const override
 	{
 		if (dot(info.normal, -ray.Direction()) <= 0)
 			return false;
 		vec3 reflected = reflect(ray.Direction(), info.normal);
-		scattered = Ray(info.point, reflected, false);
+		scattered = Ray(info.point, reflected + HelperFuncs::RandOutUnitSphere() * fuzz, false);
 		attenuation = albedo.rgb;
 		return true;
 	}
+
 	Color albedo;
+	float fuzz;
 };
 
 class GlassMat : public Material
 {
 public:
 	float refracIdxAir = 1.000293;
-	float refracIdx = 1.4;
+	float refracIdx = 1.6;
 
 	GlassMat() {}
 	GlassMat(double refracIdx) :refracIdx(refracIdx) {}
 
 	bool Scatter(const Ray& ray, const RayHitInfo& info, vec3& attenuation, Ray& scattered)const override
 	{
-		vec3 normal = info.normal;
-		float n1 = refracIdxAir, n2 = refracIdx;
-		float cosi = dot(info.normal, ray.Direction());
-		if (cosi < 0)
-			std::swap(n1, n2), normal = -normal;
-		float sini = sqrt(1 - cosi * cosi);
-		float sinr = sini * n1 / n2;
-		float cosr = sqrt(1 - sinr * sinr);
-
-		if (sinr < 0 || cosr < 0)
-			return false;
-
-		vec3 tang = normalize(ray.Direction() + cosi * info.normal);
-		vec3 ref = normal * cosr + sinr * tang;
-		scattered = Ray(info.point, ref, false);
+		vec3 outward_normal = info.normal;
+		float ni_over_nt;
 		attenuation = Color::White().rgb;
+		vec3 refracted;
+		if (dot(ray.Direction(), info.normal) > 0)
+		{
+			outward_normal = -info.normal;
+			ni_over_nt = refracIdx / refracIdxAir;
+		}
+		else
+		{
+			outward_normal = info.normal;
+			ni_over_nt = refracIdxAir / refracIdx;
+		}
+		if (HelperFuncs::Refract(ray.Direction(), outward_normal, ni_over_nt, refracted)) {
+			scattered = Ray(info.point, refracted, false);
+		}
+		else
+		{
+			vec3 reflected = reflect(ray.Direction(), info.normal);
+			scattered = Ray(info.point, reflected, true);
+			return false;
+		}
 		return true;
 	}
 };

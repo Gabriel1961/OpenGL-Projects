@@ -1,7 +1,6 @@
 #pragma once
 #include <iostream>
 #include <Common.h>
-#include "Logger.h"
 template<typename T>
 void _print(const T& val)
 {

@@ -163,6 +163,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="OpenGLWrapper\ComputeShader.cpp" />
     <ClCompile Include="OpenGLWrapper\DebugLine.cpp" />
     <ClCompile Include="OpenGLWrapper\Text\Text.cpp" />
     <ClCompile Include="OpenGLWrapper\Transform.cpp" />
@@ -181,7 +182,8 @@
     <ClCompile Include="OpenGLWrapper\vendor\stb_image\stb_image.cpp" />
     <ClCompile Include="OpenGLWrapper\VertexArray.cpp" />
     <ClCompile Include="OpenGLWrapper\VertexBuffer.cpp" />
-    <ClCompile Include="Projects\RayTracer\RayTracer.cpp" />
+    <ClCompile Include="Projects\RayTracerCPU\RayTracer.cpp" />
+    <ClCompile Include="Projects\RayTracerGPU\GPURayTracer.cpp" />
     <ClCompile Include="src\Input\Input.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -192,8 +194,10 @@
     <ClInclude Include="OpenGLWrapper\Text\ImageFont.h" />
     <ClInclude Include="OpenGLWrapper\Text\Text.h" />
     <ClInclude Include="OpenGLWrapper\Transform.h" />
-    <ClInclude Include="Projects\RayTracer\RayTracer.h" />
-    <ClInclude Include="Projects\RayTracer\RayTracingImpl.h" />
+    <ClInclude Include="OpenGLWrapper\UniformBlockList.h" />
+    <ClInclude Include="Projects\RayTracerCPU\RayTracer.h" />
+    <ClInclude Include="Projects\RayTracerCPU\RayTracingImpl.h" />
+    <ClInclude Include="Projects\RayTracerGPU\GPURayTracer.h" />
     <ClInclude Include="ScreenSize.h" />
     <ClInclude Include="OpenGLWrapper\vendor\imgui\imconfig.h" />
     <ClInclude Include="OpenGLWrapper\vendor\imgui\imgui.h" />
@@ -220,6 +224,7 @@
     <None Include="OpenGLWrapper\Line.shader" />
     <None Include="OpenGLWrapper\PixelDisplay.shader" />
     <None Include="OpenGLWrapper\Quad.shader" />
+    <None Include="Projects\RayTracerGPU\Compute.comp" />
     <None Include="res\shaders\Basic.shader" />
     <None Include="res\shaders\TriangleTex.shader" />
     <None Include="res\shaders\VeryBasic.shader" />

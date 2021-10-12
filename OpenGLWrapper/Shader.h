@@ -1,12 +1,15 @@
 #pragma once
 #include "Common.h"
 #include <unordered_map>
+#include <vector>
+#include <UniformBlockList.h>
 class Shader
 {
-private:
+protected:
 	int m_RendererID;
 	std::string m_FilePath;
 	std::unordered_map<std::string, int>m_UniformLocationCache;
+	std::vector<UniformBlock*> uniformBlocks;
 public:
 	int programID;
 	Shader() {}
@@ -26,6 +29,41 @@ public:
 	void SetUniformMat4f(const std::string& name, const glm::mat4&);
 	void SetUniformMat3f(const std::string& name, const glm::mat3& matrix);
 	void SetUniformMat2f(const std::string& name, const glm::mat2& matrix);
-private:
+
+	template<typename T>
+	void AddUniformBlockList(const std::string& name, std::vector<T>& val)
+	{
+		uniformBlocks.push_back(new UniformBlockList<T>(name, val));
+	}
+
+	void ApplyUniformBlocks() const;
+
+	template<typename T>
+	void SetUniformBlockData(const std::string& name, const T& data)
+	{
+		gc(auto idx = glGetUniformBlockIndex(programID, name.c_str()));
+		if (idx == GL_INVALID_INDEX) {
+			std::cout << "[Warning] Uniform block " << name << " not found\n";
+			return;
+		}
+		gc(glUniformBlockBinding(programID, idx, 0));
+		gc(void* ptr = glMapBuffer(GL_UNIFORM_BLOCK, GL_WRITE_ONLY));
+		if (ptr == null) {
+			std::cout << "[ERROR] Acces error in uniform block " << name;
+			return;
+		}
+		memcpy(ptr, &data, sizeof(data));
+		glUnmapBuffer(GL_UNIFORM_BLOCK);
+	}
+
+protected:
 	int GetUniformLocation(const std::string& name);
+};
+
+class ComputeShader : public Shader
+{
+public:
+	ComputeShader() {};
+	ComputeShader(const std::string& str);
+	void Dispatch(uint groups_x, uint groups_y, uint groups_z);
 };

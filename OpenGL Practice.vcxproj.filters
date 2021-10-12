@@ -75,7 +75,13 @@
     <ClCompile Include="OpenGLWrapper\DebugLine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Projects\RayTracer\RayTracer.cpp">
+    <ClCompile Include="Projects\RayTracerCPU\RayTracer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Projects\RayTracerGPU\GPURayTracer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenGLWrapper\ComputeShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -161,13 +167,19 @@
     <ClInclude Include="OpenGLWrapper\PixelDisplay.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Projects\RayTracer\RayTracer.h">
+    <ClInclude Include="Projects\RayTracerCPU\RayTracer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Projects\RayTracer\RayTracingImpl.h">
+    <ClInclude Include="Projects\RayTracerCPU\RayTracingImpl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="OpenGLWrapper\Logger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Projects\RayTracerGPU\GPURayTracer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenGLWrapper\UniformBlockList.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -178,5 +190,6 @@
     <None Include="OpenGLWrapper\Line.shader" />
     <None Include="OpenGLWrapper\Quad.shader" />
     <None Include="OpenGLWrapper\PixelDisplay.shader" />
+    <None Include="Projects\RayTracerGPU\Compute.comp" />
   </ItemGroup>
 </Project>

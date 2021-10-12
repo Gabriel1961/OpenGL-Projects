@@ -3,6 +3,8 @@
 #include "fstream"
 #include "sstream"
 #include "string"
+#include <filesystem>
+using namespace std;
 void ShaderCompilationErrorCheck(unsigned int shaderID)
 {
 	int CompileStatus;
@@ -93,14 +95,18 @@ Shader::Shader(const std::string& filepath) : m_RendererID(0), m_FilePath(filepa
 	programID = m_RendererID;
 }
 
+
 Shader::~Shader()
 {
+	for (auto x : uniformBlocks)
+		delete x;
 	gc(glDeleteProgram(m_RendererID));
 }
 
 void Shader::Bind() const
 {
 	gc(glUseProgram(m_RendererID));
+	ApplyUniformBlocks();
 }
 
 void Shader::Unbind() const
@@ -157,6 +163,13 @@ void Shader::SetUniformMat2f(const std::string& name, const glm::mat2& matrix)
 	Bind();
 	gc(glUniformMatrix2fv(GetUniformLocation(name), 1, false, &matrix[0][0]));
 }
+
+void Shader::ApplyUniformBlocks() const
+{
+	for (auto x : uniformBlocks)
+		x->BindUniformBlock(programID);
+}
+
 int Shader::GetUniformLocation(const std::string& name)
 {
 	if (m_UniformLocationCache.find(name) != m_UniformLocationCache.end())
@@ -167,4 +180,3 @@ int Shader::GetUniformLocation(const std::string& name)
 	m_UniformLocationCache[name] = location;
 	return location;
 }
-

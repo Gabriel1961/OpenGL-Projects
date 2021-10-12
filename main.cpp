@@ -8,8 +8,7 @@
 #include <iomanip>
 #define _USE_MATH_DEFINES
 
-//#include "Projects/PerlinNoise/PerlinNoiseProject.h"
-#include "RayTracer/RayTracer.h"
+#include "RayTracerGPU/GPURayTracer.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "Shader.h"
@@ -45,10 +44,10 @@ int main(void)
 		/// ///////////////////////////////////////////
 		gc(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 		gc(glEnable(GL_BLEND));
-		RayTracer::Start(window);
-
+		GPURayTracer::Start(window);
 		while (!glfwWindowShouldClose(window))
 		{
+			GPURayTracer::PreRender();
 #pragma region FrameCounter
 			double currentTime = glfwGetTime();
 			nbFrames++;
@@ -62,8 +61,7 @@ int main(void)
 			Renderer::Clear();
 			Imgui_NewFrame();
 			/* Render here */
-
-			RayTracer::Render();
+			GPURayTracer::Render();
 
 			Imgui_Render();
 			/* Swap front and back buffers */
@@ -72,7 +70,7 @@ int main(void)
 			/* Poll for and process events */
 			glfwPollEvents();
 		}
-		RayTracer::Terminate();
+		GPURayTracer::Terminate();
 	}
 	Imgui_Close();
 

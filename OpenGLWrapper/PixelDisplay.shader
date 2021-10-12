@@ -2,7 +2,7 @@
 #version 330 core
 layout(location = 0) in vec2 v_position;
 layout(location = 1) in vec2 uvCoords;
-uniform mat4 transform;
+uniform mat4 transform = mat4(1);
 out vec2 v_uvCoords;
 void main()
 {

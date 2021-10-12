@@ -15,20 +15,41 @@ static float vertData[16]
 class Quad
 {
 protected:
-	VertexArray* va;
-	IndexBuffer* ib;
-	VertexBuffer* vb;
 
 	void _Render()
 	{
+		if (useTex)
+		{
+			shader->SetUniform1i("samp", texSlot);
+			shader->SetUniform1i("useTex", useTex);
+		}
 		this->shader->SetUniform4f("color", color);
 		this->shader->SetUniformMat4f("transform", transform.GetMatrix());
 		Renderer::Draw(*va, *ib, *shader, GL_TRIANGLES);
 	}
+
 public:
+	VertexArray* va;
+	IndexBuffer* ib;
+	VertexBuffer* vb;
 	Shader* shader;
 	TransformGroup transform;
-	glm::vec4 color;
+	glm::vec4 color = glm::vec4(1);
+	int texSlot = 0;
+	bool useTex = false;
+
+	Quad(bool useTex, int texSlot, std::string shader = DEFAULT_SHADER) : useTex(useTex), texSlot(texSlot)
+	{
+		vb = new VertexBuffer(sizeof(vertData), vertData);
+		ib = new IndexBuffer(6, ibData, GL_UNSIGNED_INT);
+		VertexBufferLayout vbl;
+		vbl.Push<float>(2);
+		vbl.Push<float>(2);
+		va = new VertexArray();
+		va->AddLayout(*vb, vbl);
+		this->shader = new Shader(shader);
+	}
+
 	/// <summary>
 	/// 
 	/// </summary>
