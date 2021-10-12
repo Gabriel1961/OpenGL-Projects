@@ -198,6 +198,7 @@
     <ClInclude Include="Projects\RayTracerCPU\RayTracer.h" />
     <ClInclude Include="Projects\RayTracerCPU\RayTracingImpl.h" />
     <ClInclude Include="Projects\RayTracerGPU\GPURayTracer.h" />
+    <ClInclude Include="Projects\RayTracerGPU\GPURayTracerImpl.h" />
     <ClInclude Include="ScreenSize.h" />
     <ClInclude Include="OpenGLWrapper\vendor\imgui\imconfig.h" />
     <ClInclude Include="OpenGLWrapper\vendor\imgui\imgui.h" />

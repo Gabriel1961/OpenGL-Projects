@@ -11,6 +11,14 @@ class UniformBlock
 public:
 	virtual void BindUniformBlock(uint shaderProgramId) const = 0;
 };
+
+static uint GetNewBindingIdx()
+{
+	static uint nextIdx = 0;
+	nextIdx++;
+	return nextIdx - 1;
+}
+
 /// <summary>
 /// This class wraps the ubo and it updates it every time it needs to render
 /// </summary>
@@ -21,12 +29,6 @@ class UniformBlockList : public UniformBlock
 	uint ID;
 	uint bindingIdx;
 	std::string name;
-	uint GetNewBindingIdx()
-	{
-		static uint nextIdx = 0;
-		nextIdx++;
-		return nextIdx - 1;
-	}
 
 public:
 	//Constructors

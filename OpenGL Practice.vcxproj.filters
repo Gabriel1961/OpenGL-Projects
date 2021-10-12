@@ -182,6 +182,9 @@
     <ClInclude Include="OpenGLWrapper\UniformBlockList.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Projects\RayTracerGPU\GPURayTracerImpl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\VeryBasic.shader" />
